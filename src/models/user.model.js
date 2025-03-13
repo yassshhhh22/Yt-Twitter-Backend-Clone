@@ -26,11 +26,11 @@ const userSchema = new mongoose.Schema({
   },
   avatar: {
     type: String,
-    required: true,
+    default: "", // ✅ Allow users to register without an avatar
   },
-  coberImage: {
+  coverImage: {
     type: String,
-    required: true,
+    default: "", // ✅ Allow users to register without a cover image
   },
   watchHistory: [
     {
@@ -46,35 +46,42 @@ const userSchema = new mongoose.Schema({
     type: String,
   },
 });
-//encryption
+
+// 🔹 Hash password before saving
 userSchema.pre("save", async function (next) {
-  if (!this.isModified("password")) {
-    next();
-  }
+  if (!this.isModified("password")) return next(); // ✅ Prevent double execution
   this.password = await bcrypt.hash(this.password, 8);
   next();
 });
-//compare password
+
+// 🔹 Compare passwords
 userSchema.methods.comparePassword = async function (enteredPassword) {
   return await bcrypt.compare(enteredPassword, this.password);
 };
-//generate token
-userSchema.methods.generateToken = function () {
-  return jwt.sign({ 
-    id: this._id,
-    username: this.username,
-    email: this.email,
-    fullname: this.fullname,
 
- }, process.env.ACCESS_TOKEN_SECRET, {
-    expiresIn: process.env.ACCESS_TOKEN_EXPIRY,
-  });
+// 🔹 Generate access token
+userSchema.methods.generateAccessToken = function () {
+  if (!process.env.ACCESS_TOKEN_SECRET) throw new Error("Missing ACCESS_TOKEN_SECRET");
+  return jwt.sign(
+    {
+      id: this._id,
+      username: this.username,
+      email: this.email,
+      fullname: this.fullname,
+    },
+    process.env.ACCESS_TOKEN_SECRET,
+    { expiresIn: process.env.ACCESS_TOKEN_EXPIRY || "1h" } // ✅ Default expiry to 1 hour if missing
+  );
 };
+
+// 🔹 Generate refresh token
 userSchema.methods.generateRefreshToken = function () {
-    return jwt.sign({ 
-        id: this._id
-     }, process.env.REFRESH_TOKEN_SECRET, {
-        expiresIn: process.env.REFRESH_TOKEN_EXPIRY,
-    });
+  if (!process.env.REFRESH_TOKEN_SECRET) throw new Error("Missing REFRESH_TOKEN_SECRET");
+  return jwt.sign(
+    { id: this._id },
+    process.env.REFRESH_TOKEN_SECRET,
+    { expiresIn: process.env.REFRESH_TOKEN_EXPIRY || "7d" } // ✅ Default expiry to 7 days if missing
+  );
 };
+
 export const User = mongoose.model("User", userSchema);

@@ -28,8 +28,8 @@ router.route("/register").post(
 router.route("/logout").post(verifyJWT, logoutUser);
 router.route("/refresh-access-token").post(refreshAccessToken);
 router.route("/change-password").post(verifyJWT, changeCurrentPassword);
-router.route("/me").get(verifyJWT, getCurrentUser);
-router.route("/update-account").put(verifyJWT, updateAccountDetails);
+router.route("/current-user").get(verifyJWT, getCurrentUser);
+router.route("/update-account").patch(verifyJWT, updateAccountDetails);
 router.route("/update-avatar").put(verifyJWT, upload.single("avatar"), updateUserAvatar);
 router.route("/update-cover-image").put(verifyJWT, upload.single("coverImage"), updateUserCoverImage);
 router.route("/channel/:username").get(getUserChannelProfile);

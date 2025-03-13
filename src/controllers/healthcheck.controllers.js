@@ -1,6 +1,6 @@
 import AsyncHandler from "express-async-handler";
-import { ApiError } from "../utils/apiError";
-import { ApiResponse } from "../utils/apiResponse";
+import { ApiError } from "../utils/apiError.js";
+import { ApiResponse } from "../utils/apiResponse.js";
 
 const healthcheck=AsyncHandler(async(req,res,next)=>{
     return res 
