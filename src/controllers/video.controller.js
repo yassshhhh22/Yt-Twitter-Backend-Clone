@@ -7,7 +7,6 @@ import { Like } from "../models/like.model.js";
 import { ApiError } from "../utils/apiError.js";
 import { ApiResponse } from "../utils/apiResponse.js";
 import { uploadOnCloudinary, deleteOnCloudinary } from "../utils/cloudinary";
-import { url } from "inspector";
 
 export const getAllVideos = asynchandler(async (req, res) => {
   const { page = 1, limit = 10, query, sortBy, sortType, userId } = req.query;
